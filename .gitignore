@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#RM-Ignore Files
+#Ignnore MARS dataset files
+Video-Person-ReID-master/Data/mars/bbox_test/
+Video-Person-ReID-master/Data/mars/bbox_train/
