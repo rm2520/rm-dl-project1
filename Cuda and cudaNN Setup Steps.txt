@@ -32,8 +32,8 @@ Mon Sep 21 13:20:08 2020
 | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
 | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
 |===============================+======================+======================|
-|   0  Tesla K80           Off  | 00000000:00:04.0 Off |                    0 |
-| N/A   75C    P0    96W / 149W |      0MiB / 11441MiB |    100%      Default |
+|   0  Tesla T4            On   | 00000000:00:04.0 Off |                    0 |
+| N/A   59C    P8    12W /  70W |      0MiB / 15109MiB |      0%      Default |
 +-------------------------------+----------------------+----------------------+
                                                                                
 +-----------------------------------------------------------------------------+
@@ -129,19 +129,39 @@ import torch
 torch.cuda.is_available()
 ##################################################################################
 
-Download the dataset
+7. Download the dataset and extract ir
 
-example
-
-Mars Dataset
+example :Mars Dataset
 https://www.kaggle.com/twoboysandhats/mars-motion-analysis-and-reidentification-set
 
-wget "https://storage.googleapis.com/kaggle-data-sets/276302/571403/bundle/archive.zip?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=gcp-kaggle-com%40kaggle-161607.iam.gserviceaccount.com%2F20200921%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20200921T170510Z&X-Goog-Expires=259199&X-Goog-SignedHeaders=host&X-Goog-Signature=76831a8b58ae4354227a44670fc27c7eea4c0634c605b17b2dd56e1a31d7686da4a360bad3d0a4fb8162e4e5bf6439a021afce55e8a76be413024f800a53690ea09dcb0955d7626a74118c82e1b451db526b16eb10f908fd110af8e5cdd31a36ac00762c60231ba28c2cd98ca2746382589e90edac7f6b5d33b6576680eb70b8520336ecf25964c9c9d69ca11fa38eb423b4efcde24b4a3ff62837f3e2cbc4d8287ea169475ae19ff286cb2cd08f67d8337bfc43131efc3b08d7be3330f7ea3d68e8c77ea6c33d0c3f9234eee6d066c894d388d78bd878ae6b481b02dfa3f2ce98f20d42c9958420842fc5cff0e78afd703d76835e9d7e577a5dfa4fd622d97e" > archive.zip
+#download it from your PC then copy the download link and use it with wget command
+
+wget "https://storage.googleapis.com/kaggle-data-sets/276302/571403/bundle/archive.zip?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=gcp-kaggle-com%40kaggle-161607.iam.gserviceaccount.com%2F20200925%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20200925T084938Z&X-Goog-Expires=259199&X-Goog-SignedHeaders=host&X-Goog-Signature=9093928e3c21509c970374d1899d083845fcca636c177ad8a3db02ca50fdadae3d4037d7421acf99e93c52fb19def7dded9cc308fa1e82d3f1dc822defa8d4170415cf287bd666fe0a8741ad7eeb67d60ad3d56a7277b6342e11115e546faf21184711de1aba6780b6987db70e2de55aed7f6c59f6e8dd5da5b144561b6caed0565952c1bd03fb8290c15ec1239218a14d46d5733c341a0df3b759edc5867648241048cb697a60722e68c9acf0eea2190bcdfd1bf1f402a484c88409265f46718bece30b3a8fa995b3c7980602ce0a4d92791ba6f21a5a7d568b83edf140f869e5c99ee761849b3663b91133857009007f923369812ef676f96ef71aeb3619a8" > archive.zip
+
+##WARNING: the download dataset file name might be some part of download link
+## So rename this wrong name to archive.zip
+mv <long_file_name> archive.zip
+sudo apt install unzip
+unzip archive.zip
+
+
+##Fix dataset folder strucutrue
+cd bbox_test/
+mv * ..
+cd ..
+rm -rf bbox_test
+cd ..
+cd bbox_train/bbox_train/
+mv * ..
+cd ..
+rm -rf bbox_train
 
 
 
-
-
+#to test the code, go to Video-Person-ReID-master
+mv data Data
+nohup python main_video_person_reid.py --dataset=mars --train-batch=16 --num-instances=2 > main_video.log
+tail -1000f main_video.log
 
 
 
