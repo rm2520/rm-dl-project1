@@ -1,0 +1,148 @@
+#Useful links
+https://developer.nvidia.com/cuda-10.2-download-archive?target_os=Linux&target_arch=x86_64&target_distro=Ubuntu&target_version=1804&target_type=deblocal
+
+
+https://medium.com/@patrickorcl/install-cuda-10-and-cudnn-on-ubuntu-18-b28b59bae279
+
+https://phoenixnap.com/kb/how-to-install-anaconda-ubuntu-18-04-or-20-04
+
+https://varhowto.com/install-pytorch-cuda-10-2/
+
+##################################################################################
+
+
+1. Setup Cuda 10.2 without setup nvidia drivers
+
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
+sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda-repo-ubuntu1804-10-2-local-10.2.89-440.33.01_1.0-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu1804-10-2-local-10.2.89-440.33.01_1.0-1_amd64.deb
+sudo apt-key add /var/cuda-repo-10-2-local-10.2.89-440.33.01/7fa2af80.pub
+sudo apt-get update
+sudo apt-get -y install cuda
+
+#reboot
+
+## to Confirm
+nvidia-smi
+Mon Sep 21 13:20:08 2020       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 440.33.01    Driver Version: 440.33.01    CUDA Version: 10.2     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  Tesla K80           Off  | 00000000:00:04.0 Off |                    0 |
+| N/A   75C    P0    96W / 149W |      0MiB / 11441MiB |    100%      Default |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID   Type   Process name                             Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+
+
+
+2.Set the environment for cuda 10.2
+nano ~/.bashrc
+export PATH=/usr/local/cuda-10.2/bin${PATH:+:${PATH}}$ 
+export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+source ~/.bashrc
+sudo ldconfig
+
+
+
+##################################################################################
+
+3. download cudaNN 10.2 
+https://developer.nvidia.com/rdp/cudnn-download
+
+#FTP link
+https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/
+
+#Run the following commands
+
+curl -O https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/libcudnn8_8.0.3.33-1+cuda10.2_amd64.deb
+
+curl -O https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/libcudnn8-dev_8.0.3.33-1+cuda10.2_amd64.deb
+
+
+##################################################################################
+
+#or replacing step 3 (Setpup Google Cloud SDK for Windows 10) and run this commands (but this is slow FTP)
+
+gcloud compute --project 'your-project-name' ssh --zone 'your-zone' 'your-instance-name'
+
+setup environment ==> 1. gcloud compute --project 'high-empire-290114' ssh --zone 'us-central1-c' 'ubuntu18-cuda'
+
+secure copy from your machine 1. ==> gcloud compute scp D:\cuda10.2_deb\libcudnn8_8.0.3.33-1+cuda10.2_amd64.deb ubuntu18-cuda:/tmp
+
+secure copy from your machine 2. ==> gcloud compute scp D:\cuda10.2_deb\libcudnn8-dev_8.0.3.33-1+cuda10.2_amd64.deb ubuntu18-cuda:/tmp
+
+secure copy from your machine 3.==> gcloud compute scp D:\cuda10.2_deb\libcudnn8-samples_8.0.3.33-1+cuda10.2_amd64.deb ubuntu18-cuda:/tmp
+
+##################################################################################
+
+
+4.Setup cudaNN 10.2
+
+sudo dpkg -i libcudnn8_8.0.3.33-1+cuda10.2_amd64.deb
+sudo dpkg -i libcudnn8-dev_8.0.3.33-1+cuda10.2_amd64.deb
+sudo dpkg -i libcudnn8-samples_8.0.3.33-1+cuda10.2_amd64.deb
+
+##Verify the cuDNN installation
+cd /usr/src/cudnn_samples_v8/mnistCUDNN/
+sudo make clean
+sudo make
+./mnistCUDNN
+## you should see "Test passed!"
+
+##################################################################################
+
+5. Setup Conda
+cd /tmp
+curl -O "https://repo.anaconda.com/archive/Anaconda3-2020.07-Linux-x86_64.sh"
+
+##Optional step to verify the downloaded file ##
+sha256sum Anaconda3-2020.07-Linux-x86_64.sh
+
+## Your system will display a series of letters and numbers:
+38ce717758b95b3bd0b1797cc6ccfb76f29a90c25bdfa50ee45f11e583edfdbf  Anaconda3-2020.07-Linux-x86_64.sh
+
+##### end of Optional step ####
+bash Anaconda3-2020.07-Linux-x86_64.sh
+###press [ENTER] for license agreement then [yes] for default installation location
+source ~/.bashrc
+## to Validate setup
+conda info
+##################################################################################
+
+6. Setup pytorch 10.2 using Conda
+
+conda install pytorch torchvision cudatoolkit=10.2 -c pytorch
+
+##Verify if PyTorch is using CUDA 10.2
+python
+import torch
+torch.cuda.is_available()
+##################################################################################
+
+Download the dataset
+
+example
+
+Mars Dataset
+https://www.kaggle.com/twoboysandhats/mars-motion-analysis-and-reidentification-set
+
+wget "https://storage.googleapis.com/kaggle-data-sets/276302/571403/bundle/archive.zip?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=gcp-kaggle-com%40kaggle-161607.iam.gserviceaccount.com%2F20200921%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20200921T170510Z&X-Goog-Expires=259199&X-Goog-SignedHeaders=host&X-Goog-Signature=76831a8b58ae4354227a44670fc27c7eea4c0634c605b17b2dd56e1a31d7686da4a360bad3d0a4fb8162e4e5bf6439a021afce55e8a76be413024f800a53690ea09dcb0955d7626a74118c82e1b451db526b16eb10f908fd110af8e5cdd31a36ac00762c60231ba28c2cd98ca2746382589e90edac7f6b5d33b6576680eb70b8520336ecf25964c9c9d69ca11fa38eb423b4efcde24b4a3ff62837f3e2cbc4d8287ea169475ae19ff286cb2cd08f67d8337bfc43131efc3b08d7be3330f7ea3d68e8c77ea6c33d0c3f9234eee6d066c894d388d78bd878ae6b481b02dfa3f2ce98f20d42c9958420842fc5cff0e78afd703d76835e9d7e577a5dfa4fd622d97e" > archive.zip
+
+
+
+
+
+
+
+
+
