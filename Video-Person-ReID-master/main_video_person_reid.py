@@ -93,7 +93,6 @@ def main():
     print("==========\nArgs:{}\n==========".format(args))
     
     torch.multiprocessing.set_sharing_strategy('file_system')
-    
     if use_gpu:
         print("Currently using GPU {}".format(args.gpu_devices))
         cudnn.benchmark = True
@@ -178,6 +177,8 @@ def main():
         return
 
     start_time = time.time()
+    print("process start time ==> Total elapsed time (h:m:s): {}".format(start_time))
+
     best_rank1 = -np.inf
     if args.arch1=='resnet503d':
         torch.backends.cudnn.benchmark = False
@@ -190,9 +191,15 @@ def main():
             scheduler1.step()
             scheduler2.step()
         
-        if epoch > 0 and (epoch+1) % args.eval_step == 0 or (epoch+1)==1 or (epoch+1) == args.max_epoch:
+        if epoch > 190 and (epoch+1) % args.eval_step == 0  or (epoch+1) == args.max_epoch:
+            test_time = time.time()
+            print("Test start Time ==>".format(test_time))
             print("==> Test")
             rank1 = test(base_model,classifier_model, queryloader, galleryloader, args.pool, use_gpu)
+            elapsed_test = round(time.time() - test_time)
+            elapsed_test = str(datetime.timedelta(seconds=elapsed_test))
+            print("Test time. Total elapsed time (h:m:s): {}".format(elapsed_test))
+   
             is_best = rank1 > best_rank1
             if is_best: best_rank1 = rank1
 
@@ -291,7 +298,7 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
 
 
             for i in range(m):
-                print(i)
+               
                 b,parts1,parts2=model(imgs[:, i,:, :, :, :])
                 features.append(classifier_model(b,parts1,parts2,1,s))
 
@@ -328,7 +335,7 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
             b, n, s, c, h, w = imgs.size()
             features = []
             for i in range(n):
-                print(i)
+                
                 b, parts1,parts2 = model(imgs[:, i, :, :, :, :])
                 features.append(classifier_model(b, parts1,parts2, 1, s))
 
