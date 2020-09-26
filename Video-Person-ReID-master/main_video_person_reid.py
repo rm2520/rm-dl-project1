@@ -187,7 +187,7 @@ def main():
             scheduler1.step()
             scheduler2.step()
         
-        if (epoch+1) > 90 and (epoch+1) % args.eval_step == 0  or (epoch+1) == args.max_epoch:
+        if (epoch+1) > 0 and (epoch+1) % args.eval_step == 0 or(epoch+1) == 1 or (epoch+1) == args.max_epoch:
             print("==> Test")
             rank1 = test(base_model,classifier_model, queryloader, galleryloader, args.pool, use_gpu)
             is_best = rank1 > best_rank1
@@ -279,28 +279,29 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
             # b=1, n=number of clips, s=16
             b, n, s, c, h, w = imgs.size()
             assert(b==1)
-            features=[]
-            for i in range(n):
-                b,parts1,part2=model(imgs[:, i, :, :, :, :])
-                features.append(classifier_model(b,parts1,part2,1,s))
+            if n<40 :
+                features=[]
+                for i in range(n):
+                    b,parts1,part2=model(imgs[:, i, :, :, :, :])
+                    features.append(classifier_model(b,parts1,part2,1,s))
 
-            features = torch.cat(features, 0)
-            features = features.view(n, 1024, tot_part+1)
+                features = torch.cat(features, 0)
+                features = features.view(n, 1024, tot_part+1)
 
 
-            fnorm = torch.norm(features, p=2, dim=1, keepdim=True) * np.sqrt(tot_part+1)
-            features = features.div(fnorm.expand_as(features))
-            features = features.view(features.size(0), -1)
+                fnorm = torch.norm(features, p=2, dim=1, keepdim=True) * np.sqrt(tot_part+1)
+                features = features.div(fnorm.expand_as(features))
+                features = features.view(features.size(0), -1)
             #
             #imgs = imgs.view(b * n, s, c, h, w)
 
 
             #features=model(imgs)
-            features = torch.mean(features, 0)
-            features = features.data.cpu()
-            qf.append(features)
-            q_pids.extend(pids)
-            q_camids.extend(camids)
+                features = torch.mean(features, 0)
+                features = features.data.cpu()
+                qf.append(features)
+                q_pids.extend(pids)
+                q_camids.extend(camids)
     qf = torch.stack(qf)
     q_pids = np.asarray(q_pids)
     q_camids = np.asarray(q_camids)
@@ -315,25 +316,26 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
             imgs = Variable(imgs)
             b, n, s, c, h, w = imgs.size()
             features = []
-            for i in range(n):
-                b, parts1,parts2 = model(imgs[:, i, :, :, :, :])
-                features.append(classifier_model(b, parts1,parts2, 1, s))
+            if n<80 :
+                for i in range(n):
+                    b, parts1,parts2 = model(imgs[:, i, :, :, :, :])
+                    features.append(classifier_model(b, parts1,parts2, 1, s))
 
-            features = torch.cat(features, 0)
-            features = features.view(n, 1024, tot_part+1)
-            fnorm = torch.norm(features, p=2, dim=1, keepdim=True) * np.sqrt(tot_part+1)
-            features = features.div(fnorm.expand_as(features))
-            features = features.view(features.size(0), -1)
+                features = torch.cat(features, 0)
+                features = features.view(n, 1024, tot_part+1)
+                fnorm = torch.norm(features, p=2, dim=1, keepdim=True) * np.sqrt(tot_part+1)
+                features = features.div(fnorm.expand_as(features))
+                features = features.view(features.size(0), -1)
 
             
-            if pool == 'avg':
-                features = torch.mean(features, 0)
-            else:
-                features, _ = torch.max(features, 0)
-            features = features.data.cpu()
-            gf.append(features)
-            g_pids.extend(pids)
-            g_camids.extend(camids)
+                if pool == 'avg':
+                    features = torch.mean(features, 0)
+                else:
+                    features, _ = torch.max(features, 0)
+                features = features.data.cpu()
+                gf.append(features)
+                g_pids.extend(pids)
+                g_camids.extend(camids)
     gf = torch.stack(gf)
     g_pids = np.asarray(g_pids)
     g_camids = np.asarray(g_camids)
