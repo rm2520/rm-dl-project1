@@ -157,12 +157,16 @@ cd ..
 rm -rf bbox_train
 
 
-
 #to test the code, go to Video-Person-ReID-master
 mv data Data
-nohup python main_video_person_reid.py --dataset=mars --train-batch=16 --num-instances=2 > main_video.log
-tail -1000f main_video.log
+##Run code direct
+python ./main_video_person_reid.py --dataset=mars --train-batch=16 --num-instances=2
+##Run using nohup
+nohup python -u ./main_video_person_reid.py --dataset=mars --train-batch=16 --num-instances=2 > main_video_nohup.log &
 
+tail -1000f main_video_nohup.log
+
+PID	2351
 
 
 
