@@ -23,6 +23,7 @@ from losses import CrossEntropyLabelSmooth, TripletLoss
 from utils import AverageMeter, Logger, save_checkpoint
 from eval_metrics import evaluate
 from samplers import RandomIdentitySampler
+import multiprocessing
 
 parser = argparse.ArgumentParser(description='Train video model with cross entropy loss')
 # Datasets
@@ -90,7 +91,9 @@ def main():
     else:
         sys.stdout = Logger(osp.join(args.save_dir, 'log_test.txt'))
     print("==========\nArgs:{}\n==========".format(args))
-
+    
+    torch.multiprocessing.set_sharing_strategy('file_system')
+    
     if use_gpu:
         print("Currently using GPU {}".format(args.gpu_devices))
         cudnn.benchmark = True
