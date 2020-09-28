@@ -191,7 +191,7 @@ def main():
             scheduler1.step()
             scheduler2.step()
         
-        if epoch > 190 and (epoch+1) % args.eval_step == 0  or (epoch+1) == args.max_epoch:
+        if epoch > 0 and (epoch+1) % args.eval_step == 0 or((epoch+1) ==1) or (epoch+1) == args.max_epoch:
             test_time = time.time()
             print("Test start Time ==>".format(test_time))
             print("==> Test")
@@ -283,6 +283,7 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
     for batch_idx, (imgs, pids, camids) in enumerate(queryloader):
 
         if use_gpu:
+            imgs = imgs[:, :40, :, :, :, :]
             imgs = imgs.cuda()
         with torch.no_grad():
             #imgs = Variable(imgs)
@@ -329,6 +330,7 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
     gf, g_pids, g_camids = [], [], []
     for batch_idx, (imgs, pids, camids) in enumerate(galleryloader):
         if use_gpu:
+            imgs = imgs[:, :80, :, :, :, :]
             imgs = imgs.cuda()
         with torch.no_grad():
             imgs = Variable(imgs)

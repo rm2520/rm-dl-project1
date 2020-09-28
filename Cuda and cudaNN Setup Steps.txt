@@ -169,4 +169,9 @@ tail -1000f main_video_nohup.log
 PID	2351
 
 
+#Download gdown.pl from then next link
+https://github.com/circulosmeos/gdown.pl/blob/master/gdown.pl
+
+#Down load Duke using gDown Perl script
+sudo perl ./gdown.pl https://drive.google.com/file/d/1qIadJTpY3Wpvsubui2c4jIQTUhAWA1-y/edit DukeMTMC-VideoReID.zip
 
