@@ -191,7 +191,7 @@ def main():
             scheduler1.step()
             scheduler2.step()
         
-        if epoch > 0 and (epoch+1) % args.eval_step == 0 or((epoch+1) ==1) or (epoch+1) == args.max_epoch:
+        if epoch > 190 and (epoch+1) % args.eval_step == 0  or (epoch+1) == args.max_epoch:
             test_time = time.time()
             print("Test start Time ==>".format(test_time))
             print("==> Test")
