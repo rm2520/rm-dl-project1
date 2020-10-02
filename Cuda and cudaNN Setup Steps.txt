@@ -175,7 +175,7 @@ https://github.com/circulosmeos/gdown.pl/blob/master/gdown.pl
 #Down load Duke using gDown Perl script
 sudo perl ./gdown.pl https://drive.google.com/file/d/1qIadJTpY3Wpvsubui2c4jIQTUhAWA1-y/edit DukeMTMC-VideoReID.zip
 
-nohup python -u ./main_video_person_reid.py --dataset=duke --train-batch=16 --num-instances=2 > duke_nohup.out &
-
 python ./main_video_person_reid.py --dataset=duke --train-batch=16 --num-instances=2
 
+#to check running processes
+ps -fu mahmoud_ismaiel
