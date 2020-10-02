@@ -281,7 +281,8 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
     qf, q_pids, q_camids = [], [], []
     tot_part = args.part1 + args.part2
     for batch_idx, (imgs, pids, camids) in enumerate(queryloader):
-
+        if batch_idx == 1288:
+            continue
         if use_gpu:
             imgs = imgs[:, :40, :, :, :, :]
             imgs = imgs.cuda()
