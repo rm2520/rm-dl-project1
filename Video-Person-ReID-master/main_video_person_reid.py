@@ -335,31 +335,28 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
         with torch.no_grad():
             imgs = Variable(imgs)
             b, n, s, c, h, w = imgs.size()
-            if batch_idx ==1288:
-                print("skipp")
-            else:
-                print(batch_idx)
-                features = []
-                for i in range(n):
-                    b, parts1,parts2 = model(imgs[:, i, :, :, :, :])
-                    features.append(classifier_model(b, parts1,parts2, 1, s))
+                
+            features = []
+            for i in range(n):
+                b, parts1,parts2 = model(imgs[:, i, :, :, :, :])
+                features.append(classifier_model(b, parts1,parts2, 1, s))
 
-                features = torch.cat(features, 0)
-                features = features.view(n, 1024, tot_part+1)
-                fnorm = torch.norm(features, p=2, dim=1, keepdim=True) * np.sqrt(tot_part+1)
-                features = features.div(fnorm.expand_as(features))
-                features = features.view(features.size(0), -1)
+            features = torch.cat(features, 0)
+            features = features.view(n, 1024, tot_part+1)
+            fnorm = torch.norm(features, p=2, dim=1, keepdim=True) * np.sqrt(tot_part+1)
+            features = features.div(fnorm.expand_as(features))
+            features = features.view(features.size(0), -1)
 
             
-                if pool == 'avg':
-                    features = torch.mean(features, 0)
-                else:
-                    features, _ = torch.max(features, 0)
-                features = features.data.cpu()
-                gf.append(features)
-                g_pids.extend(pids)
-                g_camids.extend(camids)
-                torch.cuda.empty_cache()
+            if pool == 'avg':
+                features = torch.mean(features, 0)
+            else:
+                features, _ = torch.max(features, 0)
+            features = features.data.cpu()
+            gf.append(features)
+            g_pids.extend(pids)
+            g_camids.extend(camids)
+            torch.cuda.empty_cache()
     gf = torch.stack(gf)
     g_pids = np.asarray(g_pids)
     g_camids = np.asarray(g_camids)
@@ -381,6 +378,18 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
     print("CMC curve")
     for r in ranks:
         print("Rank-{:<3}: {:.1%}".format(r, cmc[r-1]))
+    print("------------------")
+    # re-ranking
+    from person_re_ranking.python_version.re_ranking_feature import re_ranking
+    rerank_distmat = re_ranking(
+        qf.numpy(), gf.numpy(), k1=20, k2=6, lambda_value=0.3)
+    print("Computing CMC and mAP for re-ranking")
+    cmc, mAP = evaluate(rerank_distmat, q_pids, g_pids, q_camids, g_camids)
+    print("Results ----------")
+    print("mAP: {:.1%}".format(mAP))
+    print("CMC curve")
+    for r in ranks:
+        print("Rank-{:<3}: {:.1%}".format(r, cmc[r - 1]))
     print("------------------")
 
     return cmc[0]
