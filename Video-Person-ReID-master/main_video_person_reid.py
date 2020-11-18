@@ -328,37 +328,38 @@ def test(model,classifier_model, queryloader, galleryloader, pool, use_gpu, rank
 
     gf, g_pids, g_camids = [], [], []
     for batch_idx, (imgs, pids, camids) in enumerate(galleryloader):
-        if batch_idx == 1288:
-            continue
+
         if use_gpu:
             imgs = imgs[:, :80, :, :, :, :]
             imgs = imgs.cuda()
         with torch.no_grad():
             imgs = Variable(imgs)
             b, n, s, c, h, w = imgs.size()
-            print(batch_idx)
-            features = []
-            for i in range(n):
-                
-                b, parts1,parts2 = model(imgs[:, i, :, :, :, :])
-                features.append(classifier_model(b, parts1,parts2, 1, s))
+            if batch_idx ==1288:
+                print("skipp")
+            else:
+                print(batch_idx)
+                features = []
+                for i in range(n):
+                    b, parts1,parts2 = model(imgs[:, i, :, :, :, :])
+                    features.append(classifier_model(b, parts1,parts2, 1, s))
 
-            features = torch.cat(features, 0)
-            features = features.view(n, 1024, tot_part+1)
-            fnorm = torch.norm(features, p=2, dim=1, keepdim=True) * np.sqrt(tot_part+1)
-            features = features.div(fnorm.expand_as(features))
-            features = features.view(features.size(0), -1)
+                features = torch.cat(features, 0)
+                features = features.view(n, 1024, tot_part+1)
+                fnorm = torch.norm(features, p=2, dim=1, keepdim=True) * np.sqrt(tot_part+1)
+                features = features.div(fnorm.expand_as(features))
+                features = features.view(features.size(0), -1)
 
             
-            if pool == 'avg':
-                features = torch.mean(features, 0)
-            else:
-                features, _ = torch.max(features, 0)
-            features = features.data.cpu()
-            gf.append(features)
-            g_pids.extend(pids)
-            g_camids.extend(camids)
-            torch.cuda.empty_cache()
+                if pool == 'avg':
+                    features = torch.mean(features, 0)
+                else:
+                    features, _ = torch.max(features, 0)
+                features = features.data.cpu()
+                gf.append(features)
+                g_pids.extend(pids)
+                g_camids.extend(camids)
+                torch.cuda.empty_cache()
     gf = torch.stack(gf)
     g_pids = np.asarray(g_pids)
     g_camids = np.asarray(g_camids)

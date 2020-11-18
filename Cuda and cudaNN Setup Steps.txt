@@ -166,8 +166,6 @@ nohup python -u ./main_video_person_reid.py --dataset=mars --train-batch=16 --nu
 
 tail -1000f main_video_nohup.log
 
-PID	2351
-
 
 #Download gdown.pl from then next link
 https://github.com/circulosmeos/gdown.pl/blob/master/gdown.pl
@@ -176,6 +174,7 @@ https://github.com/circulosmeos/gdown.pl/blob/master/gdown.pl
 sudo perl ./gdown.pl https://drive.google.com/file/d/1qIadJTpY3Wpvsubui2c4jIQTUhAWA1-y/edit DukeMTMC-VideoReID.zip
 
 python ./main_video_person_reid.py --dataset=duke --train-batch=16 --num-instances=2
+nohup python -u ./main_video_person_reid.py --dataset=duke --train-batch=16 --num-instances=2 > duke_nohup.log &
 
 #to check running processes
 ps -fu mahmoud_ismaiel
